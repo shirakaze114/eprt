@@ -6,7 +6,10 @@ date: "{{date}} 电"
 geometry: margin=2cm
 mainfont: Sarasa UI SC
 
+
 header-includes: |
+    \XeTeXlinebreaklocale "zh"
+    \XeTeXlinebreakskip = 0pt plus 1pt
     \usepackage{fancyhdr}
     \pagestyle{fancy}
     \fancyhead[C]{{{title}}}
