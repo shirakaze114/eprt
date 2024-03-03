@@ -36,4 +36,27 @@
 <div class="container-md pt-3 pb-5">
   
   <h2>Order</h2>
+
+  <form action="/act/print" method="post">
+    
+    <label for="title" class="form-label">标题</label>
+    <div class="input-group mb-3">
+      <span class="input-group-text" id="basic-addon1">ePRT电-</span>
+      <input class="form-control" id="title" name="title" aria-describedby="basic-addon1">
+    </div>
+    <div class="mb-3">
+      <label for="text" class="form-label">请输入内容</label>
+      <textarea class="form-control" name="text" id="text"></textarea>
+    </div>
+    <div class="mb-3">
+      <label for="author" class="form-label">署名</label>
+      <input class="form-control" id="author" name="author">
+    </div>
+    <div class="mb-3">
+      <label for="passwd" class="form-label">访问密码</label>
+      <input type="passwd" class="form-control" id="passwd" name="passwd" placeholder="stonhasabigcock">
+      <div id="passwdhelp" class="form-text">密码不是stonhasabigcock</div>
+    </div>
+    <button type="submit" class="btn btn-primary">提交</button>
+  </form>
 </div>
