@@ -17,7 +17,7 @@ def makedoc(title,author,text, ip):
         doc = f.read().replace("{{title}}",title).replace("{{date}}",time).replace("{{author}}",author).replace("{{ip}}",ip)
         doc = doc.replace("{{body}}",text)
 
-    filename = f"{sub(r'[\/:*?"<>| ]','-',title)}-{author}-{time}.md"
+    filename = sub(r'[\/:*?"<>| ]','-',title)+f"-{author}-{time}.md"
     with open('markdowns/'+filename,mode="w",encoding="utf-8") as f:
         f.write(doc)
 
@@ -58,7 +58,7 @@ def blowjob():
 
     filename = convert(makedoc(title,author,text,ip))
     
-    conn.printFile(printer_name, "pdfs/"+filename,f"{datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S%z")}" ,{}) 
+    conn.printFile(printer_name, "pdfs/"+filename,datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S%z") ,{}) 
     return '{"code":200, "file": "'+filename+'"}'
 
 def main():
