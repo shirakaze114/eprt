@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <title>{{ title }}</title>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 2cm;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      color: #111;
+      font-family: "Sarasa UI SC", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;
+      font-size: 11pt;
+      line-height: 1.6;
+      margin: 0;
+    }
+
+    .document-body {
+      white-space: pre-wrap;
+      overflow-wrap: anywhere;
+    }
+  </style>
+</head>
+<body>
+  <main class="document-body">{{ text }}</main>
+</body>
+</html>
