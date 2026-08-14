@@ -1,0 +1,18 @@
+[Unit]
+Description=ePRT web printing service
+After=network.target cups.service
+Wants=cups.service
+
+[Service]
+Type=simple
+User=eprt
+Group=eprt
+WorkingDirectory=/opt/eprt
+Environment="EPRT_CUPS_QUEUE=Office_Printer"
+Environment="EPRT_BROWSER_EXECUTABLE_PATH=/usr/bin/brave-browser"
+ExecStart=/opt/eprt/.venv/bin/python /opt/eprt/main.py
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
