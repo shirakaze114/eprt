@@ -146,11 +146,13 @@ class PrintRouteTest(unittest.TestCase):
             {"top": "3.5cm", "bottom": "2cm"},
         )
         header_template = fake_playwright.browser.page.pdf_options["header_template"]
-        self.assertIn("Test &lt;title&gt;", header_template)
         self.assertIn("Author &lt;script&gt;", header_template)
-        self.assertIn("IP: 127.0.0.1", header_template)
-        self.assertNotIn("Test <title>", header_template)
+        self.assertIn('class="pageNumber"', header_template)
+        self.assertIn('class="totalPages"', header_template)
+        self.assertIn("border-bottom", header_template)
         self.assertNotIn("Author <script>", header_template)
+        self.assertNotIn("IP: 127.0.0.1", header_template)
+        self.assertNotIn("Test &lt;title&gt;", header_template)
         self.assertEqual(
             fake_playwright.browser.page.pdf_options["footer_template"],
             "<div></div>",

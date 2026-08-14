@@ -3,6 +3,7 @@ import datetime
 from html import escape
 import os
 from pathlib import Path
+from re import split as re_split
 from re import sub
 
 from flask import Flask, render_template, request
@@ -15,23 +16,25 @@ PDF_DIRECTORY = Path(__file__).resolve().parent / "pdfs"
 app = Flask(__name__)
 
 
-def render_header_template(title, author, ip, timestamp):
+def render_header_template(author):
     return (
         "<style>"
         "* { box-sizing: border-box; }"
-        ".print-header {"
-        "border-bottom: 1px solid #333;"
-        "color: #111;"
+        "body { color: #111; margin: 0; }"
+        ".header-line {"
+        "border-bottom: 1px solid #111;"
+        "display: flex;"
+        "justify-content: space-between;"
         'font-family: "Sarasa UI SC", "Noto Sans CJK SC", "Source Han Sans SC", sans-serif;'
+        "font-size: 9pt;"
         "margin: 0 2cm;"
-        "padding-bottom: 0.35cm;"
+        "padding-bottom: 0.25cm;"
+        "width: 100%;"
         "}"
-        ".title { font-size: 11pt; font-weight: 600; }"
-        ".metadata { font-size: 8pt; margin-top: 0.15cm; }"
         "</style>"
-        '<div class="print-header">'
-        f'<div class="title">{escape(title)}</div>'
-        f'<div class="metadata">Author: {escape(author)} | IP: {escape(ip)} | Date: {escape(timestamp)}</div>'
+        '<div class="header-line">'
+        f'<span>{escape(author)}</span>'
+        '<span><span class="pageNumber"></span>/<span class="totalPages"></span></span>'
         "</div>"
     )
 
@@ -40,8 +43,8 @@ def get_printer_name():
     return os.environ.get("EPRT_CUPS_QUEUE", "Brother_MFC-7860DN")
 
 
-def render_pdf(title, author, text, ip, timestamp):
-    filename = sub(r'[\/:*?"<>| ]', '-', title) + f"-{author}-{timestamp}.pdf"
+def render_pdf(title, author, text, ip, date, file_stamp):
+    filename = sub(r'[\/:*?"<>| ]', '-', title) + f"-{author}-{file_stamp}.pdf"
     output_path = PDF_DIRECTORY / filename
     PDF_DIRECTORY.mkdir(parents=True, exist_ok=True)
     document = render_template(
@@ -49,8 +52,9 @@ def render_pdf(title, author, text, ip, timestamp):
         title=title,
         author=author,
         text=text,
+        paragraphs=re_split(r"\n{2,}", text),
         ip=ip,
-        date=timestamp,
+        date=date,
     )
 
     with sync_playwright() as playwright:
@@ -68,7 +72,7 @@ def render_pdf(title, author, text, ip, timestamp):
                 print_background=True,
                 prefer_css_page_size=True,
                 display_header_footer=True,
-                header_template=render_header_template(title, author, ip, timestamp),
+                header_template=render_header_template(author),
                 footer_template="<div></div>",
                 margin={"top": "3.5cm", "bottom": "2cm"},
             )
@@ -92,11 +96,17 @@ def blowjob():
     title = 'ePRT-'+request.form.get('title')
     text = request.form.get('text')
     ip = request.remote_addr
-    timestamp = datetime.datetime.now().strftime("%Y-%m-%dT%H:%M:%S%z")
+    now = datetime.datetime.now(datetime.timezone.utc)
+    date_display = now.strftime("%Y-%m-%dT%H:%M:%SZ")
+    file_stamp = datetime.datetime.now().strftime("%Y%m%dT%H%M%S%z")
 
-    filename = render_pdf(title, author, text, ip, timestamp)
+    filename = render_pdf(
+        title, author, text, ip, date=date_display, file_stamp=file_stamp
+    )
     
-    conn.printFile(get_printer_name(), str(PDF_DIRECTORY / filename), timestamp, {})
+    conn.printFile(
+        get_printer_name(), str(PDF_DIRECTORY / filename), date_display, {}
+    )
     return '{"code":200, "file": "'+filename+'"}'
 
 def main():
